@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* Custom CSS for enhanced styling and theme variables */
+        :root {
+            --body-bg: #f8f9fa; /* Light mode background */
+            --body-color: #212529; /* Light mode text color */
+            --navbar-bg: rgba(255, 255, 255, 0.9); /* Light mode navbar background with transparency */
+            --navbar-color: #0d6efd; /* Light mode navbar link color */
+            --jumbotron-bg: #e9ecef; /* Light mode jumbotron background */
+            --card-bg: #fff; /* Light mode card background */
+            --card-color: #212529; /* Light mode card text color */
+            --footer-bg: #343a40; /* Light mode footer background */
+            --footer-color: #fff; /* Light mode footer text color */
+            --btn-primary-bg: #0d6efd; /* Primary button background */
+            --btn-primary-color: #fff; /* Primary button text color */
+            --btn-primary-hover-bg: #0b5ed7; /* Primary button hover background */
+            --input-focus-border-color: #0d6efd;  /* Focus border color for form inputs */
+        }
+
+        [data-bs-theme="dark"] {
+            --body-bg: #212529; /* Dark mode background */
+            --body-color: #f8f9fa; /* Dark mode text color */
+            --navbar-bg: rgba(33, 37, 41, 0.9); /* Dark mode navbar background with transparency */
+            --navbar-color: #0dcaf0; /* Dark mode navbar link color */
+            --jumbotron-bg: #343a40; /* Dark mode jumbotron background */
+            --card-bg: #343a40; /* Dark mode card background */
+            --card-color: #f8f9fa; /* Dark mode card text color */
+            --footer-bg: #212529; /* Dark mode footer background */
+            --footer-color: #f8f9fa; /* Dark mode footer text color */
+            --btn-primary-bg: #0dcaf0; /* Primary button background in dark mode */
+            --btn-primary-color: #212529; /* Primary button text color in dark mode */
+            --btn-primary-hover-bg: #0aa1c0; /* Primary button hover background in dark mode */
+            --input-focus-border-color: #0dcaf0; /* Focus border color for form inputs in dark mode */
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--body-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar {
+            background-color: var(--navbar-bg) !important;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--navbar-color) !important;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+            color: var(--btn-primary-bg) !important; /* Use primary color for hover/active */
+        }
+
+        .jumbotron {
+            background-color: var(--jumbotron-bg);
+            color: var(--body-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            color: var(--card-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--btn-primary-bg);
+            color: var(--btn-primary-color);
+            border-color: var(--btn-primary-bg);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--btn-primary-hover-bg);
+            border-color: var(--btn-primary-hover-bg);
+        }
+
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Custom hover effect for the Home button */
+        .home-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        /* Basic styling for project cards */
+        .project-card img {
+            max-height: 150px;
+            object-fit: cover;
+            transition: transform 0.2s ease-in-out; /* Smooth transition on hover */
+        }
+
+        .project-card img:hover {
+            transform: scale(1.05); /* Enlarge image on hover */
+        }
+
+        /* Styling for the filter buttons */
+        .filter-btn.active {
+            background-color: var(--btn-primary-bg) !important;
+            border-color: var(--btn-primary-bg) !important;
+            color: var(--btn-primary-color) !important;
+        }
+        .filter-btn:hover {
+             background-color: var(--btn-primary-hover-bg) !important;
+             border-color: var(--btn-primary-hover-bg) !important;
+             color: var(--btn-primary-color) !important;
+        }
+
+        /* Animation on scroll using Bootstrap's fade-in */
+        .fade-in {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* Added transform */
+            transform: translateY(20px); /* Start 20px below its normal position */
+        }
+
+        .fade-in.show {
+            opacity: 1;
+            transform: translateY(0); /* Move to its normal position when shown */
+        }
+
+        /* Form validation styles (using CSS variables for consistency) */
+        .form-control:focus {
+            border-color: var(--input-focus-border-color);
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25); /* Use a variable, although it's defined by Bootstrap */
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            transform: translate(-0.125rem, -0.625rem) scale(0.85);
+            opacity: .65;
+            background-color: transparent; /* Make sure the label doesn't have a background */
+            padding-left: 0; /* Remove padding left which was causing issue in dark mode*/
+            color: var(--bs-form-label-color);
+        }
+        .form-floating > .form-control:focus ~ label {
+             color: var(--input-focus-border-color);
+        }
+
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-offset="0" class="scrollspy-example" tabindex="0">
+
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">My Portfolio</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#projects">Projects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+                <button id="theme-toggle" class="btn btn-outline-secondary ms-2">
+                    <i class="bi bi-sun-fill"></i> </button>
+            </div>
+        </div>
+    </nav>
+
+    <div data-bs-theme="light">
+        <section id="home" class="jumbotron py-5 mt-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2 text-center fade-in">
+                        <h1 class="display-4">Hello, I'm Jessica Chan Judilla</h1>
+                        <p class="lead">A passionate programming with a focus on creating amazing digital experiences.</p>
+                        <a href="#projects" class="btn btn-primary btn-lg home-btn">View My Projects</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="mb-4 text-center fade-in">About Me</h2>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 fade-in">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Brief Biography</h5>
+                                <p class="card-text">
+                                   
+                                </p>
+                                <p class="card-text">
+                                    I have a strong background in programming and web designing and I'm always eager to learn new technologies. My goal is to create impactful and user-friendly solutions.
+                                </p>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Experienced in Web Development</li>
+                                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Proficient in UI/UX Design</li>
+                                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Passionate about Innovation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-5">
+            <div class="container">
+                <h2 class="mb-4 text-center fade-in">My Projects</h2>
+                <div class="d-flex justify-content-center mb-3 fade-in">
+                    <button class="btn btn-outline-primary me-2 filter-btn active" data-filter="all">All</button>
+                    <button class="btn btn-outline-primary me-2 filter-btn" data-filter="web">Web Design</button>
+                    <button class="btn btn-outline-primary me-2 filter-btn" data-filter="app">App Development</button>
+                    <button class="btn btn-outline-primary filter-btn" data-filter="other">Other</button>
+                </div>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="project-gallery">
+                    <div class="col project-item" data-category="web">
+                        <div class="card project-card shadow-sm">
+                            <img src=" web.jpg" class="card-img-top" alt="Web Project 1">
+                            <div class="card-body">
+                                <h5 class="card-title">Web Project 1</h5>
+                                <p class="card-text">A brief description of web project 1.</p>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#projectModal1">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col project-item" data-category="app">
+                        <div class="card project-card shadow-sm">
+                            <img src=" app.jpg" class="card-img-top" alt="App Project 1">
+                            <div class="card-body">
+                                <h5 class="card-title">App Project 1</h5>
+                                <p class="card-text">A brief description of app project 1.</p>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#projectModal2">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col project-item" data-category="web">
+                        <div class="card project-card shadow-sm">
+                            <img src=" web1.jpg" class="card-img-top" alt="Web Project 2">
+                            <div class="card-body">
+                                <h5 class="card-title">Web Project 2</h5>
+                                <p class="card-text">A brief description of web project 2.</p>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#projectModal3">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col project-item" data-category="other">
+                        <div class="card project-card shadow-sm">
+                            <img src=" others.png" class="card-img-top" alt="Other Project 1">
+                            <div class="card-body">
+                                <h5 class="card-title">Other Project 1</h5>
+                                <p class="card-text">A brief description of other project 1.</p>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#projectModal4">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col project-item" data-category="app">
+                        <div class="card project-card shadow-sm">
+                            <img src="app1.jpg" class="card-img-top" alt="App Project 2">
+                            <div class="card-body">
+                                <h5 class="card-title">App Project 2</h5>
+                                <p class="card-text">A brief description of app project 2.</p>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#projectModal5">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col project-item" data-category="web">
+                        <div class="card project-card shadow-sm">
+                            <img src=" web2.jpg" class="card-img-top" alt="Web Project 3">
+                            <div class="card-body">
+                                <h5 class="card-title">Web Project 3</h5>
+                                <p class="card-text">A brief description of web project 3.</p>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#projectModal6">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="projectModal1" tabindex="-1" aria-labelledby="projectModal1Label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="projectModal1Label">Web Project 1 Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img src="https://via.placeholder.com/800x600?text=Web+Project+1+Large" class="img-fluid mb-3" alt="Web Project 1 Large">
+                                <p>Detailed description of Web Project 1. Include technologies used, challenges faced, and outcomes.</p>
+                                <ul>
+                                    <li>Technology: HTML, CSS, JavaScript</li>
+                                    <li>Role: Front-end Developer</li>
+                                    <li>Link: <a href="#" target="_blank">Live Demo</a></li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="projectModal2" tabindex="-1" aria-labelledby="projectModal2Label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="projectModal2Label">App Project 1 Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img src="https://via.placeholder.com/800x600?text=App+Project+1+Large" class="img-fluid mb-3" alt="App Project 1 Large">
+                                <p>Detailed description of App Project 1.  Include technologies used, challenges faced, and outcomes.</p>
+                                <ul>
+                                    <li>Technology: React Native</li>
+                                    <li>Role: Mobile App Developer</li>
+                                    <li>Link: <a href="#" target="_blank">App Store Link</a></li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="projectModal3" tabindex="-1" aria-labelledby="projectModal3Label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="projectModal3Label">Web Project 2 Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img src="https://via.placeholder.com/800x600?text=Web+Project+2+Large" class="img-fluid mb-3" alt="Web Project 2 Large">
+                                <p>Detailed description of Web Project 2. Include technologies used, challenges faced, and outcomes.</p>
+                                 <ul>
+                                    <li>Technology:  Angular</li>
+                                    <li>Role:  Front-end Developer</li>
+                                    <li>Link: <a href="#" target="_blank">Live Demo</a></li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="projectModal4" tabindex="-1" aria-labelledby="projectModal4Label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="projectModal4Label">Other Project 1 Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img src="https://via.placeholder.com/800x600?text=Other+Project+1+Large" class="img-fluid mb-3" alt="Other Project 1 Large">
+                                <p>Detailed description of Other Project 1. Include technologies used, challenges faced, and outcomes.</p>
+                                <ul>
+                                     <li>Technology:  Python, Flask</li>
+                                     <li>Role:  Backend Developer</li>
+                                     <li>Link: <a href="#" target="_blank">Project Link</a></li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="projectModal5" tabindex="-1" aria-labelledby="projectModal5Label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="projectModal5Label">App Project 2 Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img src="https://via.placeholder.com/800x600?text=App+Project+2+Large" class="img-fluid mb-3" alt="App Project 2 Large">
+                                <p>Detailed description of App Project 2. Include technologies used, challenges faced, and outcomes.</p>
+                                <ul>
+                                     <li>Technology:  Swift, SwiftUI</li>
+                                     <li>Role:  iOS Developer</li>
+                                     <li>Link: <a href="#" target="_blank">App Store</a></li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="projectModal6" tabindex="-1" aria-labelledby="projectModal6Label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="projectModal6Label">Web Project 3 Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img src="https://via.placeholder.com/800x600?text=Web+Project+3+Large" class="img-fluid mb-3" alt="Web Project 3 Large">
+                                <p>Detailed description of Web Project 3. Include technologies used, challenges faced, and outcomes.</p>
+                                <ul>
+                                     <li>Technology:  React</li>
+                                     <li>Role: Full Stack Developer</li>
+                                     <li>Link: <a href="#" target="_blank">Live Demo</a></li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="mb-4 text-center fade-in">Contact Me</h2>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 fade-in">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <form id="contactForm" class="needs-validation" novalidate>
+                                    <div class="mb-3 form-floating">
+                                        <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+                                        <label for="name">Name</label>
+                                        <div class="invalid-feedback">Please enter your name.</div>
+                                    </div>
+                                    <div class="mb-3 form-floating">
+                                        <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+                                        <label for="email">Email address</label>
+                                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                                    </div>
+                                    <div class="mb-3 form-floating">
+                                        <textarea class="form-control" placeholder="Your Message" id="message" style="height: 100px" required></textarea>
+                                        <label for="message">Message</label>
+                                        <div class="invalid-feedback">Please enter your message.</div>
+                                    </div>
+                                    <button class="btn btn-primary w-100" type="submit">Send Message</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p>&copy; 2025 My Portfolio. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <a href="#" class="text-white me-2" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-white me-2" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-2" aria-label="GitHub"><i class="bi bi-github"></i></a>
+                        <a href="#" class="text-white" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1nqE5lpLP4o6iIuXlmxjwEd03tMEP" crossorigin="anonymous"></script>
+    <script>
+        (function () {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+
+        // 7. Theme Switcher (Dark/Light Mode)
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const navbar = document.querySelector('.navbar');
+        const themeIcon = themeToggle.querySelector('i');
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.setAttribute('data-bs-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            body.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            if (theme === 'dark') {
+                themeIcon.className = 'bi bi-moon-stars-fill'; // Dark mode icon
+            } else {
+                themeIcon.className = 'bi bi-sun-fill'; // Light mode icon
+            }
+        }
+
+        // 8. Animate on Scroll (using Bootstrap's way with a custom class)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    observer.unobserve(entry.target); // Stop observing after it's shown
+                }
+            });
+        }, {
+            threshold: 0.1 // Adjust as needed
+        });
+
+        document.querySelectorAll('.fade-in').forEach(element => {
+            observer.observe(element);
+        });
+
+        // 9. Sticky Navbar on Scroll (already handled by Bootstrap's fixed-top)
+        //    No extra JS needed, but you could add more behavior if desired.
+        //    For example, changing the navbar background color on scroll:
+        // window.addEventListener('scroll', () => {
+        //     if (window.scrollY > 100) {
+        //         navbar.classList.add('bg-dark');
+        //         navbar.classList.remove('bg-light');
+        //     } else {
+        //         navbar.classList.remove('bg-dark');
+        //         navbar.classList.add('bg-light');
+        //     }
+        // });
+
+        // 4. Project Gallery Filtering
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const projectItems = document.querySelectorAll('.project-item');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const filterValue = button.dataset.filter;
+
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                projectItems.forEach(item => {
+                    if (filterValue === 'all' || item.dataset.category === filterValue) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
